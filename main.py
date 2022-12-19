@@ -55,5 +55,7 @@ image_label = tk.Label(image=None)
 image_label.pack()
 
 # Run the main loop
+window.resizable(False, False)
 window.mainloop()
+
 
