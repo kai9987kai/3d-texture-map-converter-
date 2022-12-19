@@ -1,70 +1,60 @@
-import tkinter
+import tkinter as tk
 from tkinter import filedialog
-from tkinter import PhotoImage
-from PIL import Image
-from PIL import ImageTk
+from PIL import Image, ImageTk
 
-# Create the main window
-window = tkinter.Tk()
-window.title("3D Texture Map Converter")
+# Set up the Tkinter window
+window = tk.Tk()
+window.title("Texture Map Converter")
 
-# Function to open an image file and display it in the label
-def open_image():
-  # Open a file dialog to select an image file
-  filepath = filedialog.askopenfilename()
-  # Load the image from the file
-  image = Image.open(filepath)
-  # Resize the image to fit in the label
-  image = image.resize((300, 300), Image.ANTIALIAS)
-  # Convert the image to a PhotoImage object
-  photo_image = ImageTk.PhotoImage(image=image)
-  # Update the label with the new image
-  image_label.config(image=photo_image)
-  image_label.image = photo_image
-  # Call the conversion functions with the filepath as an argument
-  convert_to_normal_map(filepath)
-  convert_to_specular_map(filepath)
+# Set up the input image
+input_image = None
+input_image_tk = None
 
-# Function to convert the image to a normal map
-def convert_to_normal_map(filepath):
-  # Open the image file
-  image = Image.open(filepath)
-  # Convert the image to a normal map using some algorithm
-  new_image = normal_map_conversion(image)
-  # Convert the new image to a PhotoImage object
-  photo_image = ImageTk.PhotoImage(image=new_image)
-  # Update the label with the new image
-  image_label.config(image=photo_image)
-  image_label.image = photo_image
+# Set up the output image
+output_image = Image.new("RGB", (300, 300), (255, 255, 255))
+output_image_tk = ImageTk.PhotoImage(output_image)
 
-# Function to convert the image to a specular map
-def convert_to_specular_map(filepath):
-  # Open the image file
-  image = Image.open(filepath)
-  # Convert the image to a specular map using some algorithm
-  new_image = specular_map_conversion(image)
-  # Convert the new image to a PhotoImage object
-  photo_image = ImageTk.PhotoImage(image=new_image)
-  # Update the label with the new image
-  image_label.config(image=photo_image)
-  image_label.image = photo_image
+# Add the input and output images to the Tkinter window
+input_label = tk.Label(window, image=input_image_tk)
+input_label.pack(side="left")
+output_label = tk.Label(window, image=output_image_tk)
+output_label.pack(side="right")
 
-# Add a button to open an image file
-open_button = tkinter.Button(text="Open Image", command=open_image)
-open_button.pack()
+# Set up the file dialog button
+def open_file_dialog():
+    # Open the file dialog and get the selected file
+    filepath = filedialog.askopenfilename()
+    # Load the selected file as the input image
+    global input_image
+    input_image = Image.open(filepath)
+    input_image = input_image.resize((300, 300), Image.ANTIALIAS)
+    global input_image_tk
+    input_image_tk = ImageTk.PhotoImage(input_image)
+    # Update the input image in the Tkinter window
+    input_label.configure(image=input_image_tk)
 
-# Add a button to convert the image to a normal map
-normal_button = tkinter.Button(text="Convert to Normal Map", command=convert_to_normal_map)
-normal_button.pack()
+file_dialog_button = tk.Button(window, text="Select Input Image", command=open_file_dialog)
+file_dialog_button.pack(side="top")
 
-# Add a button to convert the image to a specular map
-specular_button = tkinter.Button(text="Convert to Specular Map", command=convert_to_specular_map)
-specular_button.pack()
+# Set up the conversion buttons
+def normal_map():
+    # Convert the input image to a normal map
+    output_image = input_image.convert("RGB")
+    # Update the output image in the Tkinter window
+    output_image_tk.paste(output_image)
+    output_label.configure(image=output_image_tk)
 
-# Add a label to display the image
-image_label = tkinter.Label(image=None)
-image_label.pack()
+def height_map():
+    # Convert the input image to a height map
+    output_image = input_image.convert("L")
+    # Update the output image in the Tkinter window
+    output_image_tk.paste(output_image)
+    output_label.configure(image=output_image_tk)
 
-# Run the main loop
-window.resizable(False, False)
+normal_button = tk.Button(window, text="Normal Map", command=normal_map)
+normal_button.pack(side="bottom")
+height_button = tk.Button(window, text="Height Map", command=height_map)
+height_button.pack(side="bottom")
+
+# Run the Tkinter loop
 window.mainloop()
