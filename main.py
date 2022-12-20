@@ -38,8 +38,16 @@ file_dialog_button.pack(side="top")
 
 # Set up the conversion buttons
 def normal_map():
-    # Convert the input image to a normal map
-    output_image = input_image.convert("RGB")
+    # Convert the input image to grayscale
+    input_image_gray = input_image.convert("L")
+    # Apply Gaussian smoothing to the input image
+    im_smooth = smooth_gaussian(np.array(input_image_gray), sigma=5)
+    # Compute the gradient of the input image
+    gradient_x, gradient_y = gradient(im_smooth)
+    # Generate the normal map from the gradient
+    normal_map = compute_normal_map(gradient_x, gradient_y)
+    # Convert the normal map to an image
+    output_image = Image.fromarray((normal_map * 255).astype(np.uint8))
     # Update the output image in the Tkinter window
     output_image_tk.paste(output_image)
     output_label.configure(image=output_image_tk)
