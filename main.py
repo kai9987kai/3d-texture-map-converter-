@@ -7,10 +7,13 @@ import math
 root = tk.Tk()
 root.title("Image Converter")
 
-# Create a label to display the image
-image_label = tk.Label(root)
-image_label.pack()
+# Create a frame to hold the image
+image_frame = tk.Frame(root)
+image_frame.pack()
 
+# Create a label to display the image
+image_label = tk.Label(image_frame)
+image_label.pack()
 # Create a function to open an image file and display it
 def open_image():
   file_path = filedialog.askopenfilename()
