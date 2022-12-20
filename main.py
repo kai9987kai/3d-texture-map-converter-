@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
+import numpy as np
 
 # Set up the Tkinter window
 window = tk.Tk()
@@ -30,13 +31,19 @@ def open_file_dialog():
     input_image = input_image.resize((300, 300), Image.ANTIALIAS)
     global input_image_tk
     input_image_tk = ImageTk.PhotoImage(input_image)
-    # Update the input image in the Tkinter window
-    input_label.configure(image=input_image_tk)
-
-file_dialog_button = tk.Button(window, text="Select Input Image", command=open_file_dialog)
-file_dialog_button.pack(side="top")
-
-# Set up the conversion buttons
+    # Convert the input image to grayscale
+    input_image_gray = input_image.convert("L")
+    # Apply Gaussian smoothing to the input image
+    im_smooth = smooth_gaussian(np.array(input_image_gray), sigma=5)
+    # Compute the gradient of the input image
+    gradient_x, gradient_y = gradient(im_smooth)
+    # Generate the normal map from the gradient
+    normal_map = compute_normal_map(gradient_x, gradient_y)
+    # Convert the normal map to an image
+    output_image = Image.fromarray((normal_map * 255).astype(np.uint8))
+    # Update the output image in the Tkinter window
+    output_image_tk.paste(output_image)
+    output_label.configure(image=output_image_tk)
 def normal_map():
     # Convert the input image to grayscale
     input_image_gray = input_image.convert("L")
@@ -51,6 +58,10 @@ def normal_map():
     # Update the output image in the Tkinter window
     output_image_tk.paste(output_image)
     output_label.configure(image=output_image_tk)
+
+
+file_dialog_button = tk.Button(window, text="Select Input Image", command=open_file_dialog)
+file_dialog_button.pack(side="top")
 
 def height_map():
     # Convert the input image to a height map
