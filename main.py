@@ -16,11 +16,12 @@ image_label = tk.Label(image_frame)
 image_label.pack()
 # Create a function to open an image file and display it
 def open_image():
+  global image  # Declare the image variable as global
   file_path = filedialog.askopenfilename()
   image = Image.open(file_path)
   image = ImageTk.PhotoImage(image)
   image_label.config(image=image)
-  image_label.image = image
+  image_label.tk.Frame = image
 
 # Create a button to open an image file
 open_button = tk.Button(root, text="Open Image", command=open_image)
