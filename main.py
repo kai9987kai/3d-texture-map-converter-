@@ -21,6 +21,29 @@ input_label.pack(side="left")
 output_label = tk.Label(window, image=output_image_tk)
 output_label.pack(side="right")
 
+def smooth_gaussian(image, sigma=1.0):
+    # Create the Gaussian kernel
+    size = int(6 * sigma + 1)
+    kernel = np.zeros((size, size))
+    center = size // 2
+    for i in range(size):
+        for j in range(size):
+            kernel[i, j] = np.exp(-((i - center) ** 2 + (j - center) ** 2) / (2 * sigma ** 2))
+    kernel /= kernel.sum()
+    # Convolve the image with the kernel
+    image_smooth = np.zeros_like(image)
+    for i in range(1, image.shape[0] - 1):
+        for j in range(1, image.shape[1] - 1):
+            image_smooth[i, j] = (image[i-1:i+2, j-1:j+2] * kernel).sum()
+    return image_smooth
+def gradient(image):
+    # Compute the gradient in the x-direction
+    gradient_x = np.zeros_like(image)
+    gradient_x[:, :-1] = image[:, 1:] - image[:, :-1]
+    # Compute the gradient in the y-direction
+    gradient_y = np.zeros_like(image)
+    gradient_y[:-1, :] = image[1:, :] - image[:-1, :]
+    return gradient_x, gradient_y
 # Set up the file dialog button
 def open_file_dialog():
     # Open the file dialog and get the selected file
@@ -69,6 +92,7 @@ def height_map():
     # Update the output image in the Tkinter window
     output_image_tk.paste(output_image)
     output_label.configure(image=output_image_tk)
+    
 
 normal_button = tk.Button(window, text="Normal Map", command=normal_map)
 normal_button.pack(side="bottom")
